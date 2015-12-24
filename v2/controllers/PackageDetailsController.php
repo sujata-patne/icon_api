@@ -20,8 +20,6 @@ class PackageDetailsController extends BaseController{
     }
 
     public function postAction($request){
-        parent::display($request);
-        exit();
         $data = $request->parameters;
         $result = $this->packageDetails->find(ICONDB, $data);
         echo json_encode($result);

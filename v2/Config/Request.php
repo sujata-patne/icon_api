@@ -35,7 +35,7 @@ class Request{
 		
 		switch($content_type){
 			case "application/json": 
-				$body_params = json_decode($body);
+				$body_params = json_decode($body, true);
 				if($body_params){
 					foreach( $body_params as $param_name => $param_value ){
 						$parameters[$param_name] = $param_value;

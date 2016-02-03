@@ -110,7 +110,7 @@ class ContentDownloadHistoryDao extends BaseDao {
 
 	public function getContentDownloadHistoryByMsisdnByUserIdByAppId( $contentDownloadHistoryObj ){
 	   			
-		$query = "SELECT 
+		$query = "SELECT
 					  * 
 				  FROM 
 					  content_download 
@@ -144,9 +144,8 @@ class ContentDownloadHistoryDao extends BaseDao {
 	}
 	
 	public function getContentDetailsByCatelogDetailIdsAndContentMetadataIds( $cdIds, $cmdIds ){
-		
-		$query = "SELECT 
-					 cd.cd_id, 
+		$query = "SELECT
+					 parent.cd_name as parent_content_type,
 					 cm.cm_id,
 					 cm.cm_vendor,
 					 cm.cm_content_type,
@@ -154,16 +153,18 @@ class ContentDownloadHistoryDao extends BaseDao {
 					 cd1.cd_name as cm_genre,
 					 cm.cm_title,
 					 cm.cm_streaming_url,
-					 cm.cm_downloading_url
-				  FROM 
-					content_metadata cm
-				  JOIN
-					catalogue_detail cd ON ( cm.cm_content_type =  cd.cd_id )
-				  JOIN
-					catalogue_detail AS cd1 ON ( cd1.cd_id = cm.cm_genre )
+					 cm.cm_downloading_url,
+					 cft.cft_thumbnail_img_browse
+				  FROM content_metadata AS cm
+				  JOIN catalogue_detail AS cd ON ( cm.cm_content_type =  cd.cd_id )
+				  JOIN icn_manage_content_type AS mct ON ( mct.mct_cnt_type_id =  cd.cd_id )
+				  JOIN catalogue_detail AS parent ON ( mct.mct_parent_cnt_type_id =  parent.cd_id )
+				  JOIN catalogue_detail AS cd1 ON ( cd1.cd_id = cm.cm_genre )
+				  JOIN content_files_thumbnail AS cft ON ( cft.cft_cm_id = cm.cm_id )
 				  WHERE
 					 FIND_IN_SET( cd.cd_id, :cdIds ) AND
-				     FIND_IN_SET( cm.cm_id, :cmdIds ) AND 
+				     FIND_IN_SET( cm.cm_id, :cmdIds ) AND
+				     cft.cft_thumbnail_size = '125*125' AND
 				     cm.cm_property_id IS NOT NULL" ;
 		
 		$contentDownloadHistory = array();
@@ -174,9 +175,7 @@ class ContentDownloadHistoryDao extends BaseDao {
 		$statement->bindParam( ':cmdIds', $cmdIds ); 
 		$statement->execute();
 		$statement->setFetchMode(PDO::FETCH_ASSOC);
-		
-		$contentDownloadHistory = array();
-		
+
 		while($row = $statement->fetch()) {
 			$contentDownloadHistory[] = $row;
 		}

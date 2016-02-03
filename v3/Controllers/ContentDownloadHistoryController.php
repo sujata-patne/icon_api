@@ -69,14 +69,15 @@ class ContentDownloadHistoryController extends BaseController {
     			$cmdIds[] = $downloadHistory->cd_cmd_id;
     		}
     		if( !empty( $cdIds ) ){
-    			$cdIds = implode( ",", $cdIds );
+    			$cdIds = implode( ",", array_unique($cdIds) );
     		}
     		
     		if( !empty( $cmdIds ) ){
-    			$cmdIds = implode( ",", $cmdIds );
+    			$cmdIds = implode( ",", array_unique($cmdIds) );
     		}
     		
-    		$contentHistoryDetails = $contentDownloadHistory->getContentDetailsByCatelogDetailIdsAndContentMetadataIds( $cdIds, $cmdIds ); 
+    		$contentHistoryDetails = $contentDownloadHistory->getContentDetailsByCatelogDetailIdsAndContentMetadataIds( $cdIds, $cmdIds );
+
     		$response = array("status" => "SUCCESS-BUSINESS", "status_code" => '200', 'contentHistoryDetails' => $contentHistoryDetails );
     		$this->outputSuccess($response);
     		return;

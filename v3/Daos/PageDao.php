@@ -64,12 +64,9 @@ class PageDao extends BaseDao {
 						spl.sp_jed_id AS pricePoint,
 						spl.sp_id AS subscriptionPlan,
 						ipas.pas_arrange_seq
-					FROM
-						icn_pub_map_portlet_pkg  AS pub_map
-				    Right OUTER JOIN
-						icn_pub_page_portlet AS portlet ON ( pub_map.pmpp_ppp_id = portlet.ppp_id )
-				    Right OUTER JOIN
-						icn_pub_page AS pub ON ( pub.pp_id = portlet.ppp_pp_id )
+					FROM icn_pub_map_portlet_pkg  AS pub_map
+				    Right OUTER JOIN icn_pub_page_portlet AS portlet ON ( pub_map.pmpp_ppp_id = portlet.ppp_id )
+				    Right OUTER JOIN icn_pub_page AS pub ON ( pub.pp_id = portlet.ppp_pp_id )
 					LEFT OUTER JOIN icn_store_package AS sp ON ( (pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id OR pub_map.pmpp_sp_pkg_id = sp.sp_parent_pkg_id AND sp.sp_pkg_type = 0) OR (pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id AND sp.sp_pkg_type = 1))
 					LEFT OUTER JOIN icn_package_subscription_site AS pss ON (pss.pss_sp_pkg_id = sp.sp_pkg_id )
 					LEFT OUTER JOIN icn_sub_plan AS spl ON spl.sp_id = pss.pss_sp_id
@@ -157,18 +154,31 @@ class PageDao extends BaseDao {
 	}
 	
 	public function getPackageIdsByStoreId( $storeId ) {
-		$query = "SELECT
-						sp.sp_st_id AS storeId,
+		$query = "SELECT sp.sp_st_id AS storeId,
 						sp.sp_pkg_id as packageId,
 						GROUP_CONCAT(distinct(mlm.cmd_entity_detail)) as vendorIds
 					FROM icn_store_package  AS sp
+					LEFT OUTER JOIN icn_pub_map_portlet_pkg  AS pub_map ON ( (pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id OR pub_map.pmpp_sp_pkg_id = sp.sp_parent_pkg_id AND sp.sp_pkg_type = 0) OR (pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id AND sp.sp_pkg_type = 1))
+				    Right OUTER JOIN icn_pub_page_portlet AS portlet ON ( pub_map.pmpp_ppp_id = portlet.ppp_id )
+				    Right OUTER JOIN icn_pub_page AS pub ON ( pub.pp_id = portlet.ppp_pp_id )
 				    JOIN icn_store AS st ON ( sp.sp_st_id = st.st_id )
 				    JOIN multiselect_metadata_detail AS mlm ON ( mlm.cmd_group_id = st.st_vendor )
-				   	WHERE
-						sp.sp_st_id = :storeId 
+				   	WHERE sp.sp_st_id = :storeId
 						AND sp.sp_is_active = 1
 						AND ISNULL( sp.sp_crud_isactive )
-					GROUP BY sp.sp_pkg_id
+						AND portlet.ppp_is_active = 1
+						AND ISNULL( portlet.ppp_crud_isactive )
+				   		AND ISNULL( pub.pp_crud_isactive )
+						AND ISNULL( pub_map.pmpp_crud_isactive )
+						AND portlet.ppp_pkg_allow >= 0
+						AND sp.sp_crud_isactive IS NULL
+ 						AND pub_map.pmpp_crud_isactive IS NULL
+
+					GROUP BY sp.sp_pkg_id,
+					CASE WHEN sp.sp_pkg_id IS NULL
+						  THEN portlet.ppp_id
+						  ELSE 0
+					END
 					ORDER BY sp.sp_pkg_id ";
 			
 		$statement = $this->dbConnection->prepare($query);

@@ -235,7 +235,7 @@ class PageController extends BaseController {
     	}
     		
     	if (trim( $page->storeId == '') ) {
-    		$response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_PACKAGE_ID );
+    		$response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_STORE_ID );
     		$this->outputError($response);
     		return;
     	}

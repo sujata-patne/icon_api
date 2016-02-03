@@ -156,7 +156,8 @@ class PackageDao extends BaseDao {
 						cmd.cm_state = 4  AND 
 						FIND_IN_SET(cmd.cm_vendor, :vendorIds ) AND
 						cmd.cm_starts_from <= NOW() AND 
-						cmd.cm_expires_on >= NOW()
+						cmd.cm_expires_on >= NOW() AND
+						cft.cft_thumbnail_size = '125*125'
 						-- AND cg.pci_crud_isactive IS NULL AND
                         -- cg.pci_crud_isactive IS NULL AND
                         -- cg.pci_is_default = 1
@@ -227,7 +228,8 @@ class PackageDao extends BaseDao {
 						cmd.cm_expires_on >= NOW() AND
 						pct.pct_crud_isactive IS NULL AND 
 						pct.pct_is_active = 1 AND 
-						pc.pc_crud_isactive IS NULL 
+						pc.pc_crud_isactive IS NULL AND
+						cft.cft_thumbnail_size = '125*125'
 						-- pc.pc_is_active = 1 AND 
 					GROUP BY
 						portletId, cf.cf_cm_id
@@ -245,68 +247,58 @@ class PackageDao extends BaseDao {
 		while($row = $statement->fetch()) {
 			$package[] = $this->packageDetailsFromRow($row);
 		}
-		
 		return $package;
 	}
 	
-	public function getPortletsContentsBySearchKey( $packageIds,  $searchKey, $vendorIds ) {
+	public function getPortletsContentsBySearchKey( $packageIds, $searchKey, $vendorIds ) {
 		//echo $packageIds; echo $searchKey; echo $vendorIds;
 
-		$query = "SELECT
-					  DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') as timestamp,
-				      SUBSTR(CONCAT('z_',MD5(RAND()),MD5(RAND())),1,32) as promoid,
-				   	  md5(cd.cd_name) as contentTypeMD5,
-				      cft.cft_thumbnail_img_browse,
-				      cft.cft_thumbnail_size,
-				      cmd.cm_title,
-				      cmd.cm_genre,
-					  cd2.cd_name as genre,
-					  cmd.cm_key_words,
-					  cmd.cm_streaming_url,
-				      cmd.cm_downloading_url,
-				      cd.cd_id,
-				      cd.cd_name,
-				      cmd.cm_id as cft_cm_id,
-				      sp.sp_pkg_id,
-					  ( SELECT 
-						    group_concat( cd1.cd_name ) 
-					    FROM 
-						    content_metadata cm
-					    JOIN
-						    multiselect_metadata_detail mmd ON ( cm.cm_key_words = mmd.cmd_group_id )
-					    JOIN
-						    catalogue_detail cd1 ON (cd1.cd_id = mmd.cmd_entity_detail) 
-					    WHERE 
-							cm.cm_id = cft.cft_cm_id ) searchKey,
-					  mct.mct_parent_cnt_type_id as parentId
-				    FROM
-				       icn_store_package AS sp
-				    JOIN
-						icn_pack_content_type AS pct ON pct.pct_pk_id = sp.sp_pk_id
-				    JOIN
-						icn_pack_content AS pc ON pc.pc_pct_id = pct.pct_id
-				    JOIN
-						content_files_thumbnail AS cft ON cft.cft_cm_id = pc.pc_cm_id
-				    JOIN
-						content_metadata AS cmd ON cmd.cm_id = pc.pc_cm_id
-					JOIN 
-				       icn_vendor_detail AS vd ON cmd.cm_vendor = vd.vd_id
-					JOIN
-						multiselect_metadata_detail mmd ON ( mmd.cmd_group_id = cmd.cm_key_words )
-					JOIN
-						catalogue_detail AS cd ON ( cd.cd_id = cmd.cm_content_type )
-					JOIN
-						catalogue_detail cd1 ON ( cd1.cd_id = mmd.cmd_entity_detail )
-					JOIN
-						icn_manage_content_type mct ON ( mct.mct_cnt_type_id = cd.cd_id )
-					JOIN
-						catalogue_detail AS cd2 ON ( cd2.cd_id = cmd.cm_genre )
-				    WHERE
-						FIND_IN_SET(sp.sp_pkg_id, :packageIds ) AND
+		$query = "SELECT DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') as timestamp,
+					SUBSTR(CONCAT('z_',MD5(RAND()),MD5(RAND())),1,32) as promoid,
+				   	md5(cd.cd_name) as contentTypeMD5,
+				    cft.cft_thumbnail_img_browse,
+				    cft.cft_thumbnail_size,
+				    cmd.cm_title,
+				    cmd.cm_genre,
+					cd2.cd_name as genre,
+					cmd.cm_key_words,
+					cmd.cm_streaming_url,
+				    cmd.cm_downloading_url,
+				    cd.cd_id,
+				    cd.cd_name,
+				    cmd.cm_id as cft_cm_id,
+				    sp.sp_pkg_id,
+					( SELECT group_concat( cd1.cd_name ) FROM content_metadata cm
+					    JOIN multiselect_metadata_detail mmd ON ( cm.cm_key_words = mmd.cmd_group_id )
+					    JOIN catalogue_detail cd1 ON (cd1.cd_id = mmd.cmd_entity_detail)
+					    WHERE cm.cm_id = cft.cft_cm_id ) searchKey,
+					mct.mct_parent_cnt_type_id as parentId,
+					spl.sp_jed_id AS pricePoint,
+					spl.sp_id AS subscriptionPlan
+				    FROM icn_store_package AS sp
+				    JOIN icn_pack_content_type AS pct ON pct.pct_pk_id = sp.sp_pk_id
+				    JOIN icn_pack_content AS pc ON pc.pc_pct_id = pct.pct_id
+				    JOIN content_files_thumbnail AS cft ON cft.cft_cm_id = pc.pc_cm_id
+				    JOIN content_metadata AS cmd ON cmd.cm_id = pc.pc_cm_id
+					JOIN icn_vendor_detail AS vd ON cmd.cm_vendor = vd.vd_id
+					JOIN multiselect_metadata_detail mmd ON ( mmd.cmd_group_id = cmd.cm_key_words )
+					JOIN catalogue_detail AS cd ON ( cd.cd_id = cmd.cm_content_type )
+					JOIN catalogue_detail cd1 ON ( cd1.cd_id = mmd.cmd_entity_detail )
+					JOIN icn_manage_content_type mct ON ( mct.mct_cnt_type_id = cd.cd_id )
+					JOIN catalogue_detail AS cd2 ON ( cd2.cd_id = cmd.cm_genre )
+					LEFT OUTER JOIN icn_package_subscription_site AS pss ON (pss.pss_sp_pkg_id = sp.sp_pkg_id )
+					LEFT OUTER JOIN icn_sub_plan AS spl ON spl.sp_id = pss.pss_sp_id
+					LEFT OUTER JOIN icn_package_arrange_sequence AS ipas ON ipas.pas_sp_pkg_id = pss.pss_sp_pkg_id
+
+				    WHERE FIND_IN_SET(sp.sp_pkg_id, :packageIds ) AND
 						FIND_IN_SET(cmd.cm_vendor, :vendorIds ) AND
 						cmd.cm_state = 4  AND
 						cmd.cm_starts_from <= NOW() AND
-						cmd.cm_expires_on >= NOW()
+						cmd.cm_expires_on >= NOW() AND
+						cft.cft_thumbnail_size = '125*125' AND
+						spl.sp_crud_isactive IS NULL AND
+					    pss.pss_crud_isactive IS NULL
+
 					GROUP BY
 						cft.cft_cm_id
 				    ORDER BY

@@ -1,0 +1,10 @@
+ *~
+.svn
+.tmp
+.sass-cache
+.idea
+.idea/*
+.project
+/env.json
+/npm-debug.log
+.git

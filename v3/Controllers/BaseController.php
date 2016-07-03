@@ -9,7 +9,14 @@ class BaseController {
 	protected $body = '';
 	protected $length = 0;
 	protected $headers;
-	
+
+    public function logCurlAPI($extractParams){
+        $logFile = LOGS.'CurlController_'.date('d-m-Y-H').'.log';
+        $fs = fopen($logFile, 'a') or die("can't open file");
+        fwrite($fs, "\r\n");
+        file_put_contents($logFile, var_export($extractParams, true),FILE_APPEND);
+
+    }
     public function __construct( $body = '', $status = 200, $headers = array() ) {
     		$this->setStatus($status);
     		$this->headers = array('Content-Type' => 'application/json');

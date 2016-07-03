@@ -18,6 +18,9 @@ class ContentDownloadHistory extends BaseModel {
 	public $cd_app_id;
 	public $cd_download_date;
 	public $storeId;	
+	public $singleDayLimit;
+	public $downloadCount;
+	public $sub_start_date;
 
 	public function __construct($json = NULL) {
 		if (is_null($json)) {
@@ -35,7 +38,7 @@ class ContentDownloadHistory extends BaseModel {
 	}
 
 	public function validateJsonForCheckDownloadInfo($jsonObj) {
-		$requiredProps = array( 'cd_msisdn', 'cd_user_id', 'cd_app_id', 'cd_cmd_id', 'cd_cd_id' );
+ 		$requiredProps = array( 'cd_msisdn', 'cd_user_id', 'cd_app_id', 'sub_start_date'); //'singleDayLimit',
 
 		$message = $this->hasRequiredProperties($jsonObj, $requiredProps);
 		return $message;
@@ -171,6 +174,8 @@ class ContentDownloadHistory extends BaseModel {
 	}
 
 	public function checkDownloadInfo( $data ){
+		//echo "<pre>"; print_r($data); exit;
+
 		$dbConnection = PdoUtils::obtainConnection('SITE_USER');
 
 		if ($dbConnection == null) {

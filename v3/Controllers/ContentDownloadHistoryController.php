@@ -203,27 +203,22 @@ class ContentDownloadHistoryController extends BaseController {
             $this->outputError($response);
             return;
         }
-        if (trim( $contentDownloadHistory->cd_cd_id ) == '') {
-            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_CD_ID );
+       /* if (trim( $contentDownloadHistory->singleDayLimit ) == '') {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_SINGLE_DAY_LIMIT );
             $this->outputError($response);
             return;
-        }
-        if (trim( $contentDownloadHistory->cd_cmd_id ) == '') {
-            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_CMD_ID );
+        }*/
+        if (trim( $contentDownloadHistory->sub_start_date ) == '') {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_SUB_START_DATE );
             $this->outputError($response);
             return;
         }
         $downloadHistoryArray = $contentDownloadHistory->checkDownloadInfo( $contentDownloadHistory );
-         /*echo "<pre>";
-         print_r($downloadHistoryArray);
-         exit;*/
 
         if( !empty( $downloadHistoryArray ) ){
-            //$contentHistoryDetails = $contentDownloadHistory->getContentDetailsByCatelogDetailIdsAndContentMetadataIds( $cdIds, $cmdIds );
             $response = array("status" => "SUCCESS-BUSINESS", "status_code" => '200', 'contentHistoryDetails' => $downloadHistoryArray );
             $this->outputSuccess($response);
             return;
-
         }else{
             $response = array("status" => "ERROR-BUSINESS", "status_code" => '404', 'msgs' => 'No download history available !.' );
             $this->outputError($response);
@@ -288,9 +283,6 @@ class ContentDownloadHistoryController extends BaseController {
             return;
         }
         $downloadHistoryArray = $contentDownloadHistory->updateDownloadInfo( $contentDownloadHistory );
-        /*echo "<pre>";
-        print_r($downloadHistoryArray);
-        exit;*/
 
         if( !empty( $downloadHistoryArray ) ){
             //$contentHistoryDetails = $contentDownloadHistory->getContentDetailsByCatelogDetailIdsAndContentMetadataIds( $cdIds, $cmdIds );

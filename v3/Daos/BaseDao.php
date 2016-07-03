@@ -9,7 +9,13 @@ class BaseDao {
     public function __construct($dbConn) {
         $this->dbConnection = $dbConn;
     }
+    public function logCurlAPI($extractParams){
+        $logFile = LOGS.'CurlDaos_'.date('d-m-Y-H').'.log';
+        $fs = fopen($logFile, 'a') or die("can't open file");
+        fwrite($fs, "\r\n");
+        file_put_contents($logFile, var_export($extractParams, true),FILE_APPEND);
 
+    }
     protected function ccuuFromRow($obj, $row) {
         $obj->created_at = $row["created_on"];
         $obj->created_by = $row["created_by"];

@@ -1,0 +1,21 @@
+
+array (
+  0 => 
+  array (
+    'paymentChannel' => NULL,
+  ),
+  1 => 
+  array (
+    'paymentType' => NULL,
+  ),
+  2 => 
+  array (
+    'contentId' => NULL,
+    'contentType' => NULL,
+  ),
+  3 => 
+  array (
+    'dChannelId' => NULL,
+    'dChannelName' => NULL,
+  ),
+)

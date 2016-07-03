@@ -11,50 +11,80 @@ class ContentDownloadHistoryDao extends BaseDao {
 	
 	private function contentDownloadHistoryFromRow($row) {
 		$contentDlownloadHistory = new ContentDownloadHistory();
-		
-		$contentDlownloadHistory->cd_id 	   	  = $row['cd_id'];
-		$contentDlownloadHistory->cd_user_id   		  = $row['cd_user_id'];
-		$contentDlownloadHistory->cd_msisdn    		  = $row['cd_msisdn'];
-		$contentDlownloadHistory->cd_cmd_id    		  = $row['cd_cmd_id'];
-		$contentDlownloadHistory->cd_download_count       = $row['cd_download_count'];
-		$contentDlownloadHistory->cd_cd_id     		  = $row['cd_cd_id'];
-		$contentDlownloadHistory->cd_app_id    		  = $row['cd_app_id'];
-		$contentDlownloadHistory->cd_download_date        = $row['cd_download_date'];
-		
+		if( !empty( $row['cd_id'] ) ) {
+			$contentDlownloadHistory->cd_id = $row['cd_id'];
+		}
+		if( !empty( $row['cd_user_id'] ) ) {
+			$contentDlownloadHistory->cd_user_id = $row['cd_user_id'];
+		}
+		if( !empty( $row['cd_msisdn'] ) ) {
+			$contentDlownloadHistory->cd_msisdn = $row['cd_msisdn'];
+		}
+		if( !empty( $row['cd_cmd_id'] ) ) {
+			$contentDlownloadHistory->cd_cmd_id = $row['cd_cmd_id'];
+		}
+		if( !empty( $row['cd_download_count'] ) ) {
+			$contentDlownloadHistory->cd_download_count = $row['cd_download_count'];
+		}
+		if( !empty( $row['cd_cd_id'] ) ) {
+			$contentDlownloadHistory->cd_cd_id = $row['cd_cd_id'];
+		}
+		if( !empty( $row['$row'] ) ) {
+			$contentDlownloadHistory->cd_app_id = $row['cd_app_id'];
+		}
+		if( !empty( $row['downloadCount'] ) ) {
+			$contentDlownloadHistory->downloadCount	= $row['downloadCount'];
+		}
+		if( !empty( $row['sub_start_date'] ) ) {
+			$contentDlownloadHistory->sub_start_date	= $row['sub_start_date'];
+		}
+		if( !empty( $row['singleDayLimit'] ) ) {
+			$contentDlownloadHistory->singleDayLimit	= $row['singleDayLimit'];
+		}
 		$contentDlownloadHistory->unsetValues(array( 'created_on', 'created_by', 'updated_on', 'updated_by', 'storeId' ));
 		
 		return $contentDlownloadHistory;
 	}
 
 	public function checkDownloadInfo( $contentDownloadHistoryObj ){
-		$query = "SELECT * FROM content_download
-				  WHERE
-					  cd_msisdn = :cd_msisdn AND
-					  cd_user_id = :cd_user_id AND
-					  cd_app_id = :cd_app_id AND
-					  cd_cmd_id = :cd_cmd_id AND
-					  cd_cd_id = :cd_cd_id
-				  ORDER BY
-					  cd_download_date desc";
+		/*if($contentDownloadHistoryObj->singleDayLimit == 1){
+			$where = " AND DATE(cd_download_date) = DATE(NOW()) AND cd_download_date > '".$contentDownloadHistoryObj->sub_start_date."'";
+		}else{
+			$where = " AND cd_download_date BETWEEN '".$contentDownloadHistoryObj->sub_start_date."' AND NOW() ";
+		}*/
 
-		$statement = $this->dbConnection->prepare($query);
+		$query1 = "SELECT sum(cd_download_count) AS downloadCount FROM content_download
+			  WHERE cd_msisdn = ".$contentDownloadHistoryObj->cd_msisdn." AND
+				  cd_user_id = ".$contentDownloadHistoryObj->cd_user_id." AND
+				  cd_app_id = ".$contentDownloadHistoryObj->cd_app_id ." AND
+				  cd_download_date BETWEEN '".$contentDownloadHistoryObj->sub_start_date."' AND NOW()
+			  ORDER BY cd_download_date desc";
 
-		$statement->bindParam( ':cd_msisdn',  $contentDownloadHistoryObj->cd_msisdn );
-		$statement->bindParam( ':cd_user_id', $contentDownloadHistoryObj->cd_user_id );
-		$statement->bindParam( ':cd_app_id',  $contentDownloadHistoryObj->cd_app_id );
-		$statement->bindParam( ':cd_cmd_id',  $contentDownloadHistoryObj->cd_cmd_id );
-		$statement->bindParam( ':cd_cd_id',  $contentDownloadHistoryObj->cd_cd_id );
+		$statement = $this->dbConnection->prepare($query1);
 
 		$statement->execute();
-
 		$statement->setFetchMode(PDO::FETCH_ASSOC);
 
 		$contentDownloadHistory = array();
-
 		while($row = $statement->fetch()) {
-			$contentDownloadHistory[] = $this->contentDownloadHistoryFromRow($row);
+			$contentDownloadHistory['fullSubscriptionDownloadLimit'] = $row['downloadCount'];
 		}
-		return $contentDownloadHistory;
+		$query2 = "SELECT sum(cd_download_count) AS downloadCount FROM content_download
+			  WHERE cd_msisdn = ".$contentDownloadHistoryObj->cd_msisdn." AND
+				  cd_user_id = ".$contentDownloadHistoryObj->cd_user_id." AND
+				  cd_app_id = ".$contentDownloadHistoryObj->cd_app_id ." AND
+				  DATE(cd_download_date) = DATE(NOW()) AND cd_download_date > '".$contentDownloadHistoryObj->sub_start_date."'
+			  ORDER BY cd_download_date desc";
+
+		$statement = $this->dbConnection->prepare($query2);
+
+		$statement->execute();
+		$statement->setFetchMode(PDO::FETCH_ASSOC);
+
+ 		while($row = $statement->fetch()) {
+			$contentDownloadHistory['singleDayDownloadLimit'] = $row['downloadCount'];
+		}
+ 		return $contentDownloadHistory;
 	}
 
 	public function updateDownloadInfo( $contentDownloadHistoryObj ){
@@ -183,17 +213,17 @@ class ContentDownloadHistoryDao extends BaseDao {
 		return $contentDownloadHistory;
 		 
 	}
+
 	public function getContentMetaDataById( $cmdId ){
 		
-		$query = "SELECT 
-					* 
-				  FROM 
-				  	content_metadata 
-				  WHERE 
+		$query = "SELECT mct.mct_parent_cnt_type_id as parentId, parent.cd_name as parent_content_type, cm.*
+				FROM content_metadata AS cm
+				  	JOIN catalogue_detail AS cd ON ( cd.cd_id = cm.cm_content_type )
+					JOIN icn_manage_content_type mct ON ( mct.mct_cnt_type_id = cd.cd_id )
+					JOIN catalogue_detail AS parent ON ( mct.mct_parent_cnt_type_id =  parent.cd_id )
+				WHERE
 				  	cm_id = :cmdId AND 
 				  	cm_property_id IS NOT NULL" ;
-		
-		
 		
 		$statement = $this->dbConnection->prepare($query);
 		$statement->bindParam( ':cmdId',  $cmdId ); 
@@ -209,6 +239,7 @@ class ContentDownloadHistoryDao extends BaseDao {
 		return $contentMetaData;
 		 
 	}
+
 	public function getCatalogueDetailById( $cdId ){
 		
 		$query = "SELECT 
@@ -218,8 +249,7 @@ class ContentDownloadHistoryDao extends BaseDao {
 				  WHERE 
 				  	cd_id = :cdId 
 				  LIMIT 1" ;
-		
-		
+
 		
 		$statement = $this->dbConnection->prepare($query);
 		$statement->bindParam( ':cdId',  $cdId ); 
@@ -235,6 +265,5 @@ class ContentDownloadHistoryDao extends BaseDao {
 		return $catalogueDetail;
 		 
 	}
-}
-?>
+} ?>
 

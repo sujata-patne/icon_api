@@ -15,14 +15,22 @@ require_once APP.'Utils/PdoUtils.php';
 class Store extends BaseModel {
     public $storeId;
     public $operatorId;
+    public $deviceSize;
 
     public function __construct() {
         $this->storeId = '';
         $this->operatorId = '';
+        $this->deviceSize = '';
     }
 
     public function validateInputParam($jsonObj) {
         $requiredProps = array('storeId');
+
+        $message = $this->hasRequiredProperties($jsonObj, $requiredProps);
+        return $message;
+    }
+    public function validateInputParamForCG($jsonObj) {
+        $requiredProps = array('storeId','deviceSize');
 
         $message = $this->hasRequiredProperties($jsonObj, $requiredProps);
         return $message;
@@ -43,8 +51,29 @@ class Store extends BaseModel {
         return true;
     }
 
+    public function getVendorsList(){ //$storeId
+        $dbConnection = PdoUtils::obtainConnection('CMS');
+        if ($dbConnection == null) {
+            return Message::ERROR_NO_DB_CONNECTION;
+        }
+        $dbConnection->beginTransaction();
+        $storeVendorDetails = array();
+        try {
+            $store = new StoreDao($dbConnection);
+            $storeVendorDetails = $store->getVendorsList(); //$storeId
+            $dbConnection->commit();
+        } catch (\Exception $e) {
+            $dbConnection->rollBack();
+            echo $e->getMessage();
+            exit;
+        }
+        PdoUtils::closeConnection($dbConnection);
+        return $storeVendorDetails;
+    }
+
     public function getStoreDetailsByStoreId($storeId){
         $dbConnection = PdoUtils::obtainConnection('CMS');
+        $this->logCurlAPI($dbConnection);
         if ($dbConnection == null) {
             return Message::ERROR_NO_DB_CONNECTION;
         }
@@ -66,7 +95,7 @@ class Store extends BaseModel {
         PdoUtils::closeConnection($dbConnection);
         return $storeDetails;
     }
-    public function getCGImagesByStoreId($storeId){
+    public function getCGImagesByStoreId($storeId,$deviceSize){
         $dbConnection = PdoUtils::obtainConnection('CMS');
         if ($dbConnection == null) {
             return Message::ERROR_NO_DB_CONNECTION;
@@ -75,7 +104,7 @@ class Store extends BaseModel {
         $storeDetails = array();
         try {
             $store = new StoreDao($dbConnection);
-            $CGImagesDetails = $store->getCGImagesByStoreId( $storeId );
+            $CGImagesDetails = $store->getCGImagesByStoreId( $storeId, $deviceSize );
             $dbConnection->commit();
         } catch (\Exception $e) {
             $dbConnection->rollBack();
@@ -105,4 +134,5 @@ class Store extends BaseModel {
         PdoUtils::closeConnection($dbConnection);
         return $CGImagesDetails;
     }
+
 }

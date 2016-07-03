@@ -62,6 +62,12 @@ class Package extends BaseModel {
     	$message = $this->hasRequiredProperties($packageData, $requiredProps);
     	return $message;
     }
+	public function validateJsonForPlanDeails( $planData ) {
+    	$requiredProps = array( 'operatorId', 'storeId', 'eventId' );
+
+    	$message = $this->hasRequiredProperties($planData, $requiredProps);
+    	return $message;
+    }
     
     public function setValuesFromJsonObj($jsonObj) {
         $result = $this->setValuesFromJsonObjParent($jsonObj);
@@ -266,6 +272,32 @@ class Package extends BaseModel {
     	return $valuePackDetails;
     }
     
+    public function getSubscriptionPlanDetailsByEventId( $operatorId, $storeId, $eventId ){
+		$dbConnection = PdoUtils::obtainConnection('CMS');
+
+		if ($dbConnection == null) {
+			return Message::ERROR_NO_DB_CONNECTION;
+		}
+
+		$dbConnection->beginTransaction();
+
+		$valuePackDetails = array();
+
+		try {
+			$package  = new PackageDao($dbConnection );
+
+			$valuePackDetails = $package->getSubscriptionPlanDetailsByEventId( $storeId, $operatorId, $eventId );
+
+			$dbConnection->commit();
+		} catch (\Exception $e) {
+			$dbConnection->rollBack();
+			print_r($e->getMessage());
+			exit;
+		}
+
+		PdoUtils::closeConnection($dbConnection);
+		return $valuePackDetails;
+	}
     public function getSubscriptionPlanDetailsByPackageIdByOperatorId( $packageObj, $operatorId ){
     	$dbConnection = PdoUtils::obtainConnection('CMS');
     

@@ -131,7 +131,6 @@ class PackageDao extends BaseDao {
 					  cf.cf_template_id,
 				      cmd.cm_id as cf_cm_id,
 				      sp.sp_pkg_id
-				    -- , cg.pci_cg_img_browse as cg_images
 				    FROM icn_store_package AS sp
 				    JOIN icn_pub_map_portlet_pkg AS pub_map  ON( pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id )
 				    JOIN icn_pub_page_portlet AS ippp ON ippp.ppp_id = pub_map.pmpp_ppp_id
@@ -143,7 +142,6 @@ class PackageDao extends BaseDao {
 				    JOIN icn_vendor_detail AS vd ON cmd.cm_vendor = vd.vd_id
 				    JOIN catalogue_detail AS cd ON cd.cd_id = cmd.cm_content_type
 					JOIN catalogue_detail AS cd1 ON cd1.cd_id = cmd.cm_genre
-					-- JOIN icn_package_cg_image AS cg ON cg.pci_sp_pkg_id = sp.sp_pkg_id
 				    WHERE sp.sp_pkg_id = :packageId  AND
 						pub_map.pmpp_ppp_id = :portletId AND 
 						ippp.ppp_crud_isactive IS NULL  AND 
@@ -158,14 +156,10 @@ class PackageDao extends BaseDao {
 						cmd.cm_starts_from <= NOW() AND 
 						cmd.cm_expires_on >= NOW() AND
 						cft.cft_thumbnail_size = '125*125'
-						-- AND cg.pci_crud_isactive IS NULL AND
-                        -- cg.pci_crud_isactive IS NULL AND
-                        -- cg.pci_is_default = 1
 					GROUP BY 
 						portletId, cf.cf_cm_id
-						-- , cg.pci_sp_pkg_id
 				    ORDER BY 
-						portletId, cf.cf_cm_id
+						portletId,pc.pc_arrange_seq,cf.cf_cm_id
 						-- , cg.pci_sp_pkg_id ";
 		//sp.sp_pkg_id IN (".$packageIds.") AND
 		
@@ -251,59 +245,66 @@ class PackageDao extends BaseDao {
 	}
 	
 	public function getPortletsContentsBySearchKey( $packageIds, $searchKey, $vendorIds ) {
-		//echo $packageIds; echo $searchKey; echo $vendorIds;
 
 		$query = "SELECT DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') as timestamp,
-					SUBSTR(CONCAT('z_',MD5(RAND()),MD5(RAND())),1,32) as promoid,
-				   	md5(cd.cd_name) as contentTypeMD5,
-				    cft.cft_thumbnail_img_browse,
-				    cft.cft_thumbnail_size,
-				    cmd.cm_title,
-				    cmd.cm_genre,
-					cd2.cd_name as genre,
-					cmd.cm_key_words,
-					cmd.cm_streaming_url,
-				    cmd.cm_downloading_url,
-				    cd.cd_id,
-				    cd.cd_name,
-				    cmd.cm_id as cft_cm_id,
-				    sp.sp_pkg_id,
-					( SELECT group_concat( cd1.cd_name ) FROM content_metadata cm
-					    JOIN multiselect_metadata_detail mmd ON ( cm.cm_key_words = mmd.cmd_group_id )
-					    JOIN catalogue_detail cd1 ON (cd1.cd_id = mmd.cmd_entity_detail)
-					    WHERE cm.cm_id = cft.cft_cm_id ) searchKey,
-					mct.mct_parent_cnt_type_id as parentId,
-					spl.sp_jed_id AS pricePoint,
-					spl.sp_id AS subscriptionPlan
-				    FROM icn_store_package AS sp
-				    JOIN icn_pack_content_type AS pct ON pct.pct_pk_id = sp.sp_pk_id
-				    JOIN icn_pack_content AS pc ON pc.pc_pct_id = pct.pct_id
-				    JOIN content_files_thumbnail AS cft ON cft.cft_cm_id = pc.pc_cm_id
-				    JOIN content_metadata AS cmd ON cmd.cm_id = pc.pc_cm_id
+				SUBSTR(CONCAT('z_',MD5(RAND()),MD5(RAND())),1,32) as promoid,
+				md5(cd.cd_name) as contentTypeMD5,
+				cft.cft_thumbnail_img_browse,
+				cft.cft_thumbnail_size,
+				cmd.cm_title,
+				cmd.cm_genre,
+				cd2.cd_name as genre,
+				cmd.cm_key_words,
+				cmd.cm_streaming_url,
+				cmd.cm_downloading_url,
+				cd.cd_id,
+				cd.cd_name,
+				cmd.cm_id as cft_cm_id,
+				sp.sp_pkg_id,
+				( SELECT group_concat( cd1.cd_name ) FROM content_metadata cm
+					JOIN multiselect_metadata_detail mmd ON ( cm.cm_key_words = mmd.cmd_group_id )
+					JOIN catalogue_detail cd1 ON (cd1.cd_id = mmd.cmd_entity_detail)
+					WHERE cm.cm_id = cft.cft_cm_id ) searchKey,
+				mct.mct_parent_cnt_type_id as parentId,
+				parent.cd_name as parent_content_type,
+				spl.sp_jed_id AS pricePoint,
+				spl.sp_id AS subscriptionPlan,
+				spl.sp_single_day_cnt_limit AS singleDayLimit,
+				spl.sp_full_sub_cnt_limit AS fullSubDownloadLimit,
+				spl.sp_full_sub_stream_limit AS fullSubStreamContentLimit,
+				spl.sp_full_sub_stream_duration AS fullSubStreamDurationLimit,
+				spl.sp_full_sub_stream_dur_type AS fullSubStreamDurationTypeId,
+				cd3.cd_name AS fullSubStreamDurationTypeName
+				FROM icn_store_package AS sp
+					JOIN icn_pack_content_type AS pct ON pct.pct_pk_id = sp.sp_pk_id
+					JOIN icn_pack_content AS pc ON pc.pc_pct_id = pct.pct_id
+					JOIN content_files_thumbnail AS cft ON cft.cft_cm_id = pc.pc_cm_id
+					JOIN content_metadata AS cmd ON cmd.cm_id = pc.pc_cm_id
 					JOIN icn_vendor_detail AS vd ON cmd.cm_vendor = vd.vd_id
 					JOIN multiselect_metadata_detail mmd ON ( mmd.cmd_group_id = cmd.cm_key_words )
 					JOIN catalogue_detail AS cd ON ( cd.cd_id = cmd.cm_content_type )
 					JOIN catalogue_detail cd1 ON ( cd1.cd_id = mmd.cmd_entity_detail )
 					JOIN icn_manage_content_type mct ON ( mct.mct_cnt_type_id = cd.cd_id )
+					JOIN catalogue_detail AS parent ON ( mct.mct_parent_cnt_type_id =  parent.cd_id )
 					JOIN catalogue_detail AS cd2 ON ( cd2.cd_id = cmd.cm_genre )
-					LEFT OUTER JOIN icn_package_subscription_site AS pss ON (pss.pss_sp_pkg_id = sp.sp_pkg_id )
+					LEFT OUTER JOIN icn_package_subscription_site AS pss ON
+					(pss.pss_sp_pkg_id = sp.sp_pkg_id OR pss.pss_sp_pkg_id = sp.sp_parent_pkg_id AND sp.sp_pkg_type = 0)
+					OR (pss.pss_sp_pkg_id = sp.sp_pkg_id AND sp.sp_pkg_type = 1)
 					LEFT OUTER JOIN icn_sub_plan AS spl ON spl.sp_id = pss.pss_sp_id
 					LEFT OUTER JOIN icn_package_arrange_sequence AS ipas ON ipas.pas_sp_pkg_id = pss.pss_sp_pkg_id
+					LEFT OUTER JOIN catalogue_detail AS cd3 ON ( cd3.cd_id = spl.sp_full_sub_stream_dur_type )
+				WHERE FIND_IN_SET(sp.sp_pkg_id, :packageIds ) AND
+					FIND_IN_SET(cmd.cm_vendor, :vendorIds ) AND
+					cmd.cm_state = 4 AND
+					cmd.cm_starts_from <= NOW() AND
+					cmd.cm_expires_on >= NOW() AND
+					cft.cft_thumbnail_size = '125*125' AND
+					spl.sp_crud_isactive IS NULL AND
+					pss.pss_crud_isactive IS NULL
+				GROUP BY cft.cft_cm_id
+				HAVING searchKey LIKE '%".$searchKey."%'
+				ORDER BY pc.pc_arrange_seq, pas_arrange_seq, cft.cft_cm_id ";
 
-				    WHERE FIND_IN_SET(sp.sp_pkg_id, :packageIds ) AND
-						FIND_IN_SET(cmd.cm_vendor, :vendorIds ) AND
-						cmd.cm_state = 4  AND
-						cmd.cm_starts_from <= NOW() AND
-						cmd.cm_expires_on >= NOW() AND
-						cft.cft_thumbnail_size = '125*125' AND
-						spl.sp_crud_isactive IS NULL AND
-					    pss.pss_crud_isactive IS NULL
-
-					GROUP BY
-						cft.cft_cm_id
-				    ORDER BY
-						cft.cft_cm_id ";
-		//FIND_IN_SET(pub_map.pmpp_ppp_id, :portletIds ) AND
 		$statement = $this->dbConnection->prepare($query);
 		$statement->bindParam( ':packageIds', $packageIds );
 		$statement->bindParam( ':vendorIds', $vendorIds );
@@ -315,13 +316,6 @@ class PackageDao extends BaseDao {
 		while($row = $statement->fetch()) {
 			$package[] = $row ;//$this->packageDetailsFromRow($row);
 		}
-
-		$contentArray = array_filter($package, function ($var) use ($searchKey) {
-			return (stripos($var['searchKey'], $searchKey) !== false );
-		});
-
-		$package = $contentArray;
-	
 		return $package;
 	}
 	
@@ -638,7 +632,9 @@ class PackageDao extends BaseDao {
 		$stmt->bindParam( ':packageId', $packageId );
 		$stmt->execute();
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
+
 		if($stmt1->rowCount() > 0) { //mainsite packages
+			//echo "main";
 			$query = "SELECT sp.sp_pkg_id, spl.*, SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id, dscl.dcl_disclaimer
 					FROM icn_store_package AS sp
 					JOIN icn_pub_map_portlet_pkg AS pub_map  ON( pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id )
@@ -653,14 +649,13 @@ class PackageDao extends BaseDao {
 					    AND sp.sp_parent_pkg_id = 0
 						AND pss.pss_crud_isactive IS NULL
 						AND pss.pss_is_active = 1
-						AND dscl.dcl_partner_id = :operatorId
 						AND ippp.ppp_crud_isactive IS NULL
 						AND pub_map.pmpp_crud_isactive IS NULL
-					GROUP BY spl.sp_id
-					HAVING BINARY dcl_partner_id = :operatorId ";
+					GROUP BY dcl_id
+					HAVING dcl_partner_id LIKE :operatorId ";
+			//spl.sp_id
 		}else if($stmt->rowCount() > 0){ //Mapped with mainsite packages
-			//echo "mapped mainsite"; exit;
-
+		//echo "mapped";
 			$query = "SELECT SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id, dscl.dcl_disclaimer, spl.*
 					FROM icn_store_package AS sp
 					inner join icn_store_package AS sp1 on sp.sp_pkg_id = sp1.sp_parent_pkg_id
@@ -676,14 +671,12 @@ class PackageDao extends BaseDao {
 						AND sp1.sp_crud_isactive IS NULL
 						AND pss.pss_crud_isactive IS NULL
 						AND pss.pss_is_active = 1
-						AND dscl.dcl_partner_id = :operatorId
 						AND ippp.ppp_crud_isactive IS NULL
 						AND pub_map.pmpp_crud_isactive IS NULL
-					GROUP BY spl.sp_id
-					HAVING BINARY dcl_partner_id = :operatorId ";
+					GROUP BY dcl_id
+					HAVING dcl_partner_id LIKE :operatorId ";
 		}else { //pack site packages
-			//echo "packsite"; exit;
-
+		//echo "individual";
 			 $query = "SELECT sp.sp_pkg_id, spl.*, SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id, dscl.dcl_disclaimer
 					FROM icn_store_package AS sp
 					JOIN icn_pub_map_portlet_pkg AS pub_map  ON( pub_map.pmpp_sp_pkg_id = sp.sp_pkg_id )
@@ -698,13 +691,13 @@ class PackageDao extends BaseDao {
 					    AND sp.sp_parent_pkg_id = 0
 						AND pss.pss_crud_isactive IS NULL
 						AND pss.pss_is_active = 1
-						AND dscl.dcl_partner_id = :operatorId
 						AND ippp.ppp_crud_isactive IS NULL
 						AND pub_map.pmpp_crud_isactive IS NULL
-					GROUP BY spl.sp_id
-					HAVING BINARY dcl_partner_id = :operatorId ";
+					GROUP BY dcl_id
+					HAVING dcl_partner_id LIKE :operatorId ";
 		}
- 		$statement = $this->dbConnection->prepare($query);
+		//echo $query;
+  		$statement = $this->dbConnection->prepare($query);
 		$statement->bindParam( ':packageId', $packageId );
 		$statement->bindParam( ':operatorId', $operatorId );
 		$statement->execute();
@@ -717,6 +710,43 @@ class PackageDao extends BaseDao {
 
 		return $subscriptionDetails;
 
+	}
+
+	public function getSubscriptionPlanDetailsByEventId( $operatorId, $storeId, $eventId ){
+		$length = strlen($operatorId);
+
+		$query = "SELECT ipas.pas_arrange_seq, sp.sp_pkg_id, spl.*,  SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id, dscl.dcl_disclaimer
+					FROM icn_store_package AS sp
+					JOIN icn_package_subscription_site AS pss ON pss.pss_sp_pkg_id = sp.sp_pkg_id
+					JOIN icn_sub_plan AS spl ON spl.sp_id = pss.pss_sp_id
+					JOIN icn_disclaimer AS dscl ON ( dscl.dcl_st_id = sp.sp_st_id AND dscl.dcl_ref_jed_id = spl.sp_jed_id )
+					LEFT OUTER JOIN icn_package_arrange_sequence AS ipas ON ipas.pas_plan_id = spl.sp_id
+					WHERE sp.sp_st_id = :storeId
+					AND spl.sp_jed_id = :eventId
+						AND sp.sp_is_active = 1
+						AND sp.sp_crud_isactive IS NULL
+						AND sp.sp_pkg_type = 0
+					    AND sp.sp_parent_pkg_id = 0
+						AND pss.pss_crud_isactive IS NULL
+						AND pss.pss_is_active = 1
+						AND ipas.pas_plan_type = 'Subscription'
+					-- GROUP BY dcl_id, spl.sp_id
+					HAVING BINARY dcl_partner_id = :operatorId
+					ORDER BY ipas.pas_arrange_seq ASC";
+
+		$statement = $this->dbConnection->prepare($query);
+		$statement->bindParam( ':storeId', $storeId );
+		$statement->bindParam( ':eventId', $eventId );
+		$statement->bindParam( ':operatorId', $operatorId );
+		$statement->execute();
+		$statement->setFetchMode(PDO::FETCH_ASSOC);
+
+		$subscriptionDetails = array();
+		while($row = $statement->fetch()) {
+			$subscriptionDetails[] = $row;
+		}
+
+		return $subscriptionDetails;
 	}
 }
 ?>

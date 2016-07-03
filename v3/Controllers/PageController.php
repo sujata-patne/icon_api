@@ -19,6 +19,45 @@ class PageController extends BaseController {
        echo "coming";exit;
     }
 
+    public function getPageContents( $request ) {
+
+        $json = json_encode( $request->parameters );
+
+        $page = new Page();
+        $jsonObj = json_decode($json);
+
+        $jsonMessage = $page->validateJsonPageObj($jsonObj);
+        if ($jsonMessage != Message::SUCCESS) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => $jsonMessage);
+            $this->outputError($response);
+            return;
+        }
+
+        if (!$page->setValuesFromJsonObj($jsonObj)) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_INVAID_REQUEST_BODY);
+            $this->outputError($response);
+            return;
+        }
+
+        if (trim( $jsonObj->pageTitle == '' )) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_PAGE_TITLE );
+            $this->outputError($response);
+            return;
+        }
+
+        $pageContents = $page->getPageContents( $jsonObj->pageTitle );
+
+        if( empty( $pageContents ) ){
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_PACKAGE_LOAD );
+            $this->outputError($response);
+            return;
+        }else{
+            $response = array("status" => "SUCCESS-BUSINESS", "status_code" => '200', 'pageContents' => $pageContents );
+            $this->outputSuccess($response);
+            return;
+        }
+    }
+
     public function getPackageDetails( $request ) {
         
         $json = json_encode( $request->parameters );
@@ -126,6 +165,48 @@ class PageController extends BaseController {
       		$this->outputError($response);
       		return;
       	}
+    }
+
+    public function getSubscriptionPlanDeailsByEventId( $request ) {
+        $json = json_encode( $request->parameters );
+
+        $package = new Package();
+        $jsonObj = json_decode($json);
+
+        $jsonMessage = $package->validateJsonForPlanDeails($jsonObj);
+
+        if ($jsonMessage != Message::SUCCESS) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => $jsonMessage);
+            $this->outputError($response);
+            return;
+        }
+
+        if (trim( $jsonObj->operatorId ) == '') {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_OPERATOR_ID );
+            $this->outputError($response);
+            return;
+        }
+        if (trim( $jsonObj->storeId ) == '') {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_STORE_ID );
+            $this->outputError($response);
+            return;
+        }
+        if (trim( $jsonObj->eventId ) == '') {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_EVENT_ID );
+            $this->outputError($response);
+            return;
+        }
+
+        $subscriptionPlanDetails = $package->getSubscriptionPlanDetailsByEventId( $jsonObj->storeId, $jsonObj->operatorId, $jsonObj->eventId );
+        if(!empty($subscriptionPlanDetails)){
+            $response = array("status" => "SUCCESS-BUSINESS", "status_code" => '200', 'subscriptionPlanDetails' => $subscriptionPlanDetails );
+            $this->outputSuccess($response);
+            return;
+        }else {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => 'Invalid plan details!.');
+            $this->outputError($response);
+            return;
+        }
     }
 
     public function getPageDetails( $request ) {
@@ -241,7 +322,7 @@ class PageController extends BaseController {
     	}
     		
     	if (trim( $page->searchKey == '') ) {
-    		$response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_CONTENT_TYPE);
+    		$response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_SEARCHKEY);
     		$this->outputError($response);
     		return;
     	}

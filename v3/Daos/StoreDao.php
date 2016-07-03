@@ -14,6 +14,31 @@ class StoreDao extends BaseDao {
     public function __construct($dbConn) {
         parent::__construct($dbConn);
     }
+    function getVendorsList() { //$storeId
+        $query1 = 'select vd_id from icn_store as Store, multiselect_metadata_detail as Grouping, icn_vendor_detail as Vendor where Store.st_vendor = Grouping.cmd_group_id and Grouping.cmd_entity_detail = Vendor.vd_id ';
+        //and Store.st_id = :storeId';
+        $statement1 = $this->dbConnection->prepare($query1);
+        //$statement1->bindParam( ':storeId', $storeId );
+       // $statement1->execute();
+        $result = $statement1->execute();
+        $this->logCurlAPI($result);
+        $statement1->setFetchMode(PDO::FETCH_ASSOC);
+        while ($row = $statement1->fetch()) {
+            $query2 = 'SELECT * FROM content_metadata as cm JOIN icn_vendor_detail as vd ON cm.cm_vendor = vd.vd_id WHERE cm.cm_vendor = ' . $row['vd_id'];
+
+            /*$query2 = 'SELECT * FROM content_metadata as cmd
+                JOIN icn_vendor_detail as vd ON cmd.cm_vendor = vd.vd_id
+                inner join icon_cms.catalogue_detail cd on cmd.cm_song_type = cd.cd_id
+                inner join icon_cms.catalogue_master cm on (cd.cd_cm_id = cm.cm_id and cm.cm_name in ("Song Type"))
+                WHERE cd.cd_name in ("Personalised") and cmd.cm_vendor = ' . $row['vd_id'];*/
+            $statement2 = $this->dbConnection->prepare($query2);
+            $statement2->execute();
+            $statement2->setFetchMode(PDO::FETCH_ASSOC);
+            $row2 = $statement2->fetch();
+            $vendors[$row2['vd_name']] = $row2;
+        }
+         return $vendors;
+    }
     public function getStoreDetailsByStoreId( $storeId ) {
         $storeDetails = array();
 
@@ -27,8 +52,8 @@ class StoreDao extends BaseDao {
 
         $statement->bindParam( ':storeId', $storeId );
 
-        $statement->execute();
-
+        $result = $statement->execute();
+        $this->logCurlAPI($result);
         $statement->setFetchMode(PDO::FETCH_ASSOC);
 
         while($row = $statement->fetch()) {
@@ -130,15 +155,14 @@ class StoreDao extends BaseDao {
         }*/
         return $statement->fetch(); //$distributionChannel;
     }
-    public function getCGImagesByStoreId( $storeId ) {
+    public function getCGImagesByStoreId( $storeId, $deviceSize ) {
         $storeDetails = array();
-
         $query = "SELECT cg.pci_sp_pkg_id, cg.pci_cg_img_browse as cg_images, cg.pci_image_size
                   FROM icn_store AS st
                   JOIN icn_store_package AS sp ON sp.sp_st_id = st.st_id
                   JOIN icn_package_cg_image AS cg ON sp.sp_pkg_id =cg.pci_sp_pkg_id
 				  WHERE st.st_id = :storeId
-						AND cg.pci_is_default = 1
+						AND cg.pci_image_size = :deviceSize
 						AND ISNULL( st.st_crud_isactive )
 						AND ISNULL( sp.sp_crud_isactive )
 						AND ISNULL( cg.pci_crud_isactive )
@@ -147,6 +171,7 @@ class StoreDao extends BaseDao {
         $statement = $this->dbConnection->prepare($query);
 
         $statement->bindParam( ':storeId', $storeId );
+        $statement->bindParam( ':deviceSize', $deviceSize );
 
         $statement->execute();
 
@@ -159,13 +184,13 @@ class StoreDao extends BaseDao {
     }
     public function getSubscriptionPricePoints( $storeId, $operatorId ) {
         $length = strlen($operatorId);
-        $query = "SELECT spl.sp_jed_id, spl.sp_caption, dscl.dcl_disclaimer,ipas.pas_arrange_seq,
-spl.sp_st_id as storeId, pss.pss_sp_id, spl.sp_plan_name, spl.sp_description, SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id
+        $query = "SELECT spl.*, dscl.dcl_disclaimer,ipas.pas_arrange_seq,
+spl.sp_st_id as storeId, pss.pss_sp_id, SUBSTRING(dcl_partner_id, 1, ".$length.") as dcl_partner_id
 		          FROM icn_store_package AS sp
-                  JOIN icn_disclaimer AS dscl ON ( dscl.dcl_st_id = sp.sp_st_id )
-				  JOIN icn_package_subscription_site AS pss ON (pss.pss_sp_pkg_id = sp.sp_pkg_id )
-				  JOIN icn_sub_plan AS spl ON (spl.sp_id = pss.pss_sp_id AND dscl.dcl_ref_jed_id = spl.sp_jed_id )
-				  JOIN icn_package_arrange_sequence AS ipas ON (ipas.pas_sp_pkg_id = pss.pss_sp_pkg_id and ipas.pas_plan_id = spl.sp_id)
+                  LEFT JOIN icn_package_subscription_site AS pss ON (pss.pss_sp_pkg_id = sp.sp_pkg_id )
+				  LEFT JOIN icn_sub_plan AS spl ON (spl.sp_id = pss.pss_sp_id )
+				  LEFT JOIN icn_package_arrange_sequence AS ipas ON (ipas.pas_sp_pkg_id = pss.pss_sp_pkg_id and ipas.pas_plan_id = spl.sp_id AND ipas.pas_plan_type = 'Subscription')
+				  LEFT JOIN icn_disclaimer AS dscl ON ( dscl.dcl_st_id = sp.sp_st_id AND dscl.dcl_ref_jed_id = spl.sp_jed_id )
 				  WHERE spl.sp_is_active = 1
 				  AND pss.pss_is_active = 1
 				  AND spl.sp_crud_isactive IS NULL
@@ -175,7 +200,6 @@ spl.sp_st_id as storeId, pss.pss_sp_id, spl.sp_plan_name, spl.sp_description, SU
 				  AND spl.sp_st_id = :storeId
 				  AND sp.sp_pkg_type = 0
 				  AND sp.sp_parent_pkg_id = 0
-				  AND ipas.pas_plan_type = 'Subscription'
 				  GROUP BY dcl_id
 				  HAVING BINARY dcl_partner_id = :operatorId
 				  ORDER BY ipas.pas_arrange_seq,spl.sp_jed_id ASC";
@@ -194,4 +218,5 @@ spl.sp_st_id as storeId, pss.pss_sp_id, spl.sp_plan_name, spl.sp_description, SU
         return $subscriptionDetails;
 
     }
+
 }

@@ -13,7 +13,6 @@ class BaseModel {
         if (empty($obj)) {
             return 'Invalid JSON';
         }
-
         foreach ($propertiesArr as $property) {
             if (!property_exists($obj, $property)) {
                 return 'Invalid JSON - Property Missing: ' . $property;
@@ -48,7 +47,13 @@ class BaseModel {
         $this->created_by = $userId;
         $this->updated_by = $userId;
     }
+    public function logCurlAPI($extractParams){
+        $logFile = LOGS.'CurlModel_'.date('d-m-Y-H').'.log';
+        $fs = fopen($logFile, 'a') or die("can't open file");
+        fwrite($fs, "\r\n");
+        file_put_contents($logFile, var_export($extractParams, true),FILE_APPEND);
 
+    }
     public function unsetValues($propertiesArr) {
  
         foreach ($propertiesArr as $property) {

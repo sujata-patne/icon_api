@@ -19,7 +19,17 @@ class Page extends BaseModel {
 	public $deviceWidth;
 	public $searchKey;
 	public $pageId;
-	
+	public $pageTitle;
+	public $subscriptionPlan;
+	public $pas_arrange_seq;
+	public $pricePoint;
+	public $singleDayLimit;
+	public $fullSubDownloadLimit;
+	public $fullSubStreamContentLimit;
+	public $fullSubStreamDurationLimit;
+	public $fullSubStreamDurationTypeId;
+	public $fullSubStreamDurationTypeName;
+
     public function __construct($json = NULL) {
     	$this->pageName = '';
     	$this->storeId = '';
@@ -30,10 +40,17 @@ class Page extends BaseModel {
     	$this->deviceHeight = '';
     	$this->deviceWidth = '';
     	$this->searchKey = '';
+    	$this->pageTitle = '';
     	$this->pageId = '';
     	$this->pricePoint = '';
     	$this->subscriptionPlan = '';
     	$this->pas_arrange_seq = '';
+		$this->singleDayLimit  = '';
+		$this->fullSubDownloadLimit = '';
+		$this->fullSubStreamContentLimit = '';
+		$this->fullSubStreamDurationLimit = '';
+		$this->fullSubStreamDurationTypeId = '';
+		$this->fullSubStreamDurationTypeName = '';
 
         if (is_null($json)) {
             return;
@@ -48,7 +65,14 @@ class Page extends BaseModel {
     	$message = $this->hasRequiredProperties($jsonObj, $requiredProps);
     	return $message;
     }
-    
+
+	public function validateJsonPageObj($jsonObj) {
+		$requiredProps = array( 'pageTitle' );
+
+		$message = $this->hasRequiredProperties($jsonObj, $requiredProps);
+		return $message;
+	}
+
     public function validateJsonObj($jsonObj) {
     	$requiredProps = array( 'pageId' );
     
@@ -63,32 +87,15 @@ class Page extends BaseModel {
     	return $message;
     }
 
-    public function setValuesFromJsonObj($jsonObj) {
-        $result = $this->setValuesFromJsonObjParent($jsonObj);
+	public function setValuesFromJsonObj($jsonObj) {
+		$result = $this->setValuesFromJsonObjParent($jsonObj);
 
-        if (!$result) {
-            return $result;
-        }
+		if (!$result) {
+			return $result;
+		}
 
-        //$package = new Package();
-
-        //if (property_exists($jsonObj, "sp_pkg_id")) {
-
-          //  $packageObj = $jsonObj->sp_pkg_id;
-
-            /* if (property_exists($sessionObj, "pageName")) {
-                $session->pageName = $sessionObj->pageName;
-            }
-            
-            if (property_exists($sessionObj, "storeId")) {
-            	$session->storeId = $sessionObj->storeId;
-            } */
-        //}
-
-       // $this->packageId = $package;  */
-
-        return true;
-    }
+		return true;
+	}
 
     public  function generateUserId() {
 
@@ -123,6 +130,32 @@ class Page extends BaseModel {
     	PdoUtils::closeConnection($dbConnection);
     	return $pageDetails;
     }
+	public function getPageContents( $pageTitle ) {
+		$dbConnection = PdoUtils::obtainConnection('CMS');
+
+		if ($dbConnection == null) {
+			return Message::ERROR_NO_DB_CONNECTION;
+		}
+
+		$dbConnection->beginTransaction();
+
+		$pageDetails = array();
+
+		try {
+			$page = new PageDao($dbConnection);
+			$pageDetails = $page->getPageContents( $pageTitle );
+
+			$dbConnection->commit();
+		} catch (\Exception $e) {
+			$dbConnection->rollBack();
+			echo $e->getMessage();
+			exit;
+		}
+
+		PdoUtils::closeConnection($dbConnection);
+		return $pageDetails;
+	}
+
     public function getPackageIdsByPageId( $pageId ) {
     	$dbConnection = PdoUtils::obtainConnection('CMS');
     	 

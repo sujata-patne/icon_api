@@ -6,8 +6,8 @@
  * Time: 18:37
  */
 
-include_once(APP."models/Package.php");
-
+require_once APP.'Models/Message.php';
+require_once APP.'Models/Package.php';
 class PackageDetailsController extends BaseController{
     private $packageDetails;
 

@@ -65,7 +65,9 @@ public function getAllPacksByPackageIds( $packageId, $portletId, $storeId, $temp
 					cft.cft_thumbnail_size,
 					cf.cf_template_id,
 					cf.cf_url,
-					cf.cf_url_base
+					cf.cf_url_base,
+					ipas.pas_arrange_seq
+
 				FROM 
 					icn_store_package as isp
 				JOIN
@@ -84,6 +86,8 @@ public function getAllPacksByPackageIds( $packageId, $portletId, $storeId, $temp
 					content_files_thumbnail cft ON ( cft.cft_cm_id = cmd.cm_id AND cft.cft_crud_isactive IS NULL )
 				LEFT OUTER JOIN 
 					content_files cf ON ( cf.cf_cm_id = cmd.cm_id AND cf.cf_crud_isactive IS NULL )
+				LEFT OUTER JOIN icn_package_arrange_sequence AS ipas ON ipas.pas_sp_pkg_id = isp.sp_pkg_id
+
 				WHERE
 					isp.sp_pkg_id = :packageId AND 
 					pub_map.pmpp_ppp_id = :portletId AND 
@@ -92,8 +96,8 @@ public function getAllPacksByPackageIds( $packageId, $portletId, $storeId, $temp
 					pub_map.pmpp_crud_isactive IS NULL AND
 					isp.sp_is_active = 1 AND
 					cf.cf_template_id = :templateId  AND
-					( cft.cft_thumbnail_size = '125*125' OR cft.cft_thumbnail_size = '125X125' ) ";
-		 
+					( cft.cft_thumbnail_size = '125*125' OR cft.cft_thumbnail_size = '125X125' )
+				ORDER BY icn_pc.pc_arrange_seq, pas_arrange_seq ";
 		$statement = $this->dbConnection->prepare($query);
 		$statement->bindParam( ':packageId', $packageId );
 		$statement->bindParam( ':portletId', $portletId );

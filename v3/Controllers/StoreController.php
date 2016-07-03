@@ -40,6 +40,7 @@ class StoreController extends BaseController {
             return;
         }
         $storeDetails = $store->getStoreDetailsByStoreId( $jsonObj->storeId );
+        $this->logCurlAPI($storeDetails);
 
         if( empty( $storeDetails ) ){
             $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_STORE_LOAD );
@@ -52,13 +53,46 @@ class StoreController extends BaseController {
         }
 
     }
+    public function getVendorsList($request){
+        $json = json_encode( $request->parameters );
+        $store = new Store();
+        $jsonObj = json_decode($json);
+
+        //$validationMessage = $store->validateInputParam($jsonObj);
+        /*if ($validationMessage != Message::SUCCESS) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => $validationMessage);
+            $this->outputError($response);
+            return;
+        }*/
+        if (!$store->setValuesFromJsonObj($jsonObj)) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_INVAID_REQUEST_BODY);
+            $this->outputError($response);
+            return;
+        }
+        /*if (trim( $jsonObj->storeId == '' )) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_STORE_ID );
+            $this->outputError($response);
+            return;
+        }*/
+        $storeVendorDetails = $store->getVendorsList();    //$jsonObj->storeId
+         if( empty( $storeVendorDetails ) ){
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_STORE_LOAD );
+            $this->outputError($response);
+            return;
+        }else{
+            $response = array("status" => "SUCCESS-BUSINESS", "status_code" => '200', 'storeVendorDetails' => $storeVendorDetails );
+            $this->outputSuccess($response);
+            return;
+        }
+
+    }
 
     public function getCGImagesByStoreId($request){
         $json = json_encode( $request->parameters );
         $store = new Store();
         $jsonObj = json_decode($json);
 
-        $validationMessage = $store->validateInputParam($jsonObj);
+        $validationMessage = $store->validateInputParamForCG($jsonObj);
         if ($validationMessage != Message::SUCCESS) {
             $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => $validationMessage);
             $this->outputError($response);
@@ -74,7 +108,12 @@ class StoreController extends BaseController {
             $this->outputError($response);
             return;
         }
-        $storeCGImages = $store->getCGImagesByStoreId( $jsonObj->storeId );
+        if (trim( $jsonObj->deviceSize == '' )) {
+            $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_BLANK_DEVICE_SIZE_ID );
+            $this->outputError($response);
+            return;
+        }
+        $storeCGImages = $store->getCGImagesByStoreId( $jsonObj->storeId, $jsonObj->deviceSize );
 
         if( empty( $storeCGImages ) ){
             $response = array("status" => "ERROR", "status_code" => '400', 'msgs' => Message::ERROR_STORE_LOAD );
@@ -126,4 +165,5 @@ class StoreController extends BaseController {
         }
 
     }
+
 }

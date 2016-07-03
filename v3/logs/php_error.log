@@ -1,0 +1,102 @@
+[02-Mar-2016 11:24:47 Europe/Berlin] PHP Fatal error:  Call to undefined method ContentsController::getMaxVOId() in D:\xampp\htdocs\apiICON\v3\index.php on line 46
+[02-Mar-2016 11:24:47 Europe/Berlin] PHP Stack trace:
+[02-Mar-2016 11:24:47 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[02-Mar-2016 11:28:05 Europe/Berlin] PHP Fatal error:  Call to undefined method ContentsController::getMaxVOId() in D:\xampp\htdocs\apiICON\v3\index.php on line 46
+[02-Mar-2016 11:28:05 Europe/Berlin] PHP Stack trace:
+[02-Mar-2016 11:28:05 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:28 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:38 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:22:39 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:13 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:14 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Warning:  include(D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php): failed to open stream: No such file or directory in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Warning:  include(): Failed opening 'D:\xampp\htdocs\apiICON\v3/Controllers/PagesController.php' for inclusion (include_path='.;D:\xampp\php\PEAR') in D:\xampp\htdocs\apiICON\v3\index.php on line 16
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   2. class_exists() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   3. spl_autoload_call() D:\xampp\htdocs\apiICON\v3\index.php:34
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   4. apiAutoload() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\xampp\htdocs\apiICON\v3\index.php:16) in D:\xampp\htdocs\apiICON\v3\index.php on line 49
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP Stack trace:
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   1. {main}() D:\xampp\htdocs\apiICON\v3\index.php:0
+[07-Mar-2016 05:23:15 Europe/Berlin] PHP   2. header() D:\xampp\htdocs\apiICON\v3\index.php:49

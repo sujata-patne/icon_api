@@ -22,7 +22,10 @@ class Message {
     const ERROR_PAGE_NOT_FOUND = 'The requested page route does not exist';
     const ERROR_BLANK_PAGENAME = 'Page name is required !.';
     const ERROR_BLANK_PAGE_ID = 'Page Id is required !.';
+    const ERROR_BLANK_PAGE_TITLE = 'Page Title is required !.';
     const ERROR_BLANK_STORE_ID = 'Store Id is required !.';
+    const ERROR_BLANK_DEVICE_SIZE_ID = 'Device Size is required !.';
+    const ERROR_BLANK_EVENT_ID = 'EventId / PricePoint is required !.';
     const ERROR_BLANK_DEVICE_HEIGHT = 'Device height is required !.';
     const ERROR_BLANK_DEVICE_WIDTH = 'Device width is required !.';
     const ERROR_STORE_LOAD = 'Failed to load store info';
@@ -34,12 +37,24 @@ class Message {
     const ERROR_BLANK_PROMO_ID = 'PromoId is required !.';
     const ERROR_BLANK_OPERATOR_ID = 'Operator Id is required !.';
     const ERROR_BLANK_MSISDN = 'MSISDN is required !.';
+    const ERROR_BLANK_SEARCHKEY = 'Search Key is required !.';
     const ERROR_BLANK_USER_ID = 'User Id is required !.';
     const ERROR_BLANK_APP_ID = 'App Id is required !.';
-    const ERROR_BLANK_CMD_ID = 'Cmd Id is required !.';
-    const ERROR_BLANK_CD_ID = 'Cd Id is required !.';
+    const ERROR_BLANK_CMD_ID = 'Content Metadata Id is required !.';
+    const ERROR_BLANK_CD_ID = 'cd_id is required !.';
+    const ERROR_BLANK_SUB_START_DATE = 'Subscription Start Date is required !.';
     const ERROR_BLANK_CD_DOWNLOAD_COUNT = 'Download Count is required !.';
     const ERROR_BLANK_CD_DOWNLOAD_DATE = 'Download Date is required !.';
+    const ERROR_BLANK_SINGLE_DAY_LIMIT = 'Single Day limit is required !.';
+
+    const ERROR_BLANK_CF_ID = 'cf_id is required !.';
+    const ERROR_BLANK_CF_BASE_URL = 'cf_url_base is required !.';
+    const ERROR_BLANK_CF_URL = 'cf_url is required !.';
+    const ERROR_BLANK_CF_TEMPLATE_ID = 'cf_template_id is required !.';
+    const ERROR_BLANK_CF_USER_NAME = 'cf_name is required !.';
+    const ERROR_BLANK_CF_USER_ALIAS = 'cf_name_alias is required !.';
+    const ERROR_BLANK_VCODE = 'vcode is required !.';
+    const ERROR_BLANK_VO_ID = 'vo_id is required !.';
 
     public $message = '';
     public $type = '';
